@@ -1,34 +1,29 @@
 from pydantic import BaseModel
 
 
-class ItemBase(BaseModel):
+class ItemIn(BaseModel):
     Title: str
 
-
-class ItemCreate(ItemBase):
-    pass
-
-
-class Item(ItemBase):
+class ItemOut(BaseModel):
     Id: int
-    Owner_Id: int
+    Title: str
+    User_Id: int
 
     class Config:
         from_attributes = True
 
 
-class UserBase(BaseModel):
+class UserOut(BaseModel):
+    Id: int
     Email: str
-
-
-class UserCreate(UserBase):
-    Password: str
-
-
-class User(UserBase):
-    Id: int
     Is_Active: bool
-    Items: list[Item] = []
+    Items: list[ItemOut] = []
 
     class Config:
         from_attributes = True
+
+
+class UserIn(BaseModel):
+    Email: str
+    Password: str
+    Is_Active: bool = True

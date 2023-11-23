@@ -4,6 +4,7 @@ from sqlalchemy.ext.asyncio import (
     async_sessionmaker,
     AsyncSession,
     AsyncEngine,
+    AsyncAttrs,
 )
 
 db_url = "sqlite+aiosqlite:///users.db"
@@ -13,7 +14,7 @@ engine: AsyncEngine = create_async_engine(
 session = async_sessionmaker(engine)
 
 
-class Base(DeclarativeBase):
+class Base(AsyncAttrs, DeclarativeBase):
     pass
 
 

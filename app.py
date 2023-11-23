@@ -1,10 +1,9 @@
-from http import HTTPStatus
 import uvicorn
 from fastapi import FastAPI, Depends, HTTPException
 import crud
 from database import get_db
-from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
-from schemas import UserCreate
+from sqlalchemy.ext.asyncio import AsyncSession
+from schemas import ItemIn, ItemOut, UserIn, UserOut
 
 
 app = FastAPI()
@@ -14,8 +13,7 @@ app = FastAPI()
 async def get_users(
     db: AsyncSession = Depends(get_db), skip: int = 0, limit: int = 100
 ):
-    users = await crud.get_all_users(db, skip, limit)
-    return users
+    return await crud.get_all_users(db, skip, limit)
 
 
 @app.get("/users/{id}")
@@ -27,9 +25,15 @@ async def get_user(id: int, db: AsyncSession = Depends(get_db)):
 
 
 @app.post("/users")
-async def add_user(user: UserCreate, db: AsyncSession = Depends(get_db)):
-    await crud.create_user(db, user)
-    return HTTPStatus.CREATED
+async def add_user(user: UserIn, db: AsyncSession = Depends(get_db)) -> UserOut:
+    return await crud.create_user(db, user)
+
+
+@app.post("/items")
+async def add_item(
+    id: int, item: ItemIn, db: AsyncSession = Depends(get_db)
+) -> ItemOut:
+    return await crud.create_item(db, item, id)
 
 
 if __name__ == "__main__":

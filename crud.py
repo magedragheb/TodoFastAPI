@@ -1,13 +1,13 @@
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from automapper import mapper
 from models import User, Item
-from schemas import ItemCreate, UserCreate
+from schemas import ItemIn, ItemOut, UserIn, UserOut
 
 
-async def get_user_by_id(db: AsyncSession, user_id: int) -> User | None:
+async def get_user_by_id(db: AsyncSession, user_id: int):
     user = await db.execute(select(User).where(User.Id == user_id))
-    s = user.scalars()
     return user.scalars().first()
 
 
@@ -21,13 +21,14 @@ async def get_all_users(db: AsyncSession, skip: int = 0, limit: int = 100):
     return result.scalars().all()
 
 
-async def create_user(db: AsyncSession, user: UserCreate):
-    hashed = user.Password + "hash"
-    db_user = User(Email=user.Email, Password=hashed)
-    db.add(db_user)
+async def create_user(db: AsyncSession, user_in: UserIn) -> UserOut:
+    user_in.Password = user_in.Password + "hash"
+    user = User(**user_in.model_dump())
+    db.add(user)
     await db.commit()
-    await db.refresh(db_user)
-    return db_user
+    await db.refresh(user)
+    usermap: UserOut = mapper.to(UserOut).map(user)
+    return usermap
 
 
 async def get_items(db: AsyncSession, skip: int = 0, limit: int = 100):
@@ -35,9 +36,10 @@ async def get_items(db: AsyncSession, skip: int = 0, limit: int = 100):
     return items.scalars().all()
 
 
-async def create_item(db: AsyncSession, item: ItemCreate, user_id: int):
-    db_item = Item(**item.model_dump(), User_Id=user_id)
-    db.add(db_item)
+async def create_item(db: AsyncSession, item_in: ItemIn, user_id: int) -> ItemOut:
+    item = Item(Title=item_in.Title, User_Id=user_id)
+    db.add(item)
     await db.commit()
-    await db.refresh(db_item)
-    return db_item
+    await db.refresh(item)
+    itemmap: ItemOut = mapper.to(ItemOut).map(item)
+    return itemmap
