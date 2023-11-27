@@ -9,7 +9,7 @@ class User(Base):
     Email: Mapped[str] = mapped_column(
         String(50), nullable=False, unique=True, index=True
     )
-    Password: Mapped[str] = mapped_column(String(50), nullable=False)
+    Password: Mapped[str] = mapped_column(String(50), nullable=False, deferred=True)
     Is_Active: Mapped[bool] = mapped_column(Boolean, default=True)
 
     Items = relationship("Item", back_populates="User", lazy="selectin")

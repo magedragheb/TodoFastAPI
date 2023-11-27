@@ -4,6 +4,7 @@ from pydantic import BaseModel
 class ItemIn(BaseModel):
     Title: str
 
+
 class ItemOut(BaseModel):
     Id: int
     Title: str
