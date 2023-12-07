@@ -8,6 +8,8 @@ fastapi = "*"
 uvicorn = "*"
 sqlalchemy = "*"
 aiosqlite = "*"
+alembic = "*"
+python-dotenv = "*"
 
 [dev-packages]
 
